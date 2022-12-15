@@ -48,9 +48,7 @@ class CompilationCacheTest(jtu.JaxTestCase):
 
   def setUp(self):
     super().setUp()
-    supported_platforms = ["tpu"]
-    if "--xla_gpu_enable_xla_runtime_executable=true" in os.environ.get("XLA_FLAGS", ""):
-      supported_platforms.append("gpu")
+    supported_platforms = ["tpu", "gpu"]
     if "--xla_cpu_use_xla_runtime=true" in os.environ.get("XLA_FLAGS", ""):
       supported_platforms.append("cpu")
     if jtu.device_under_test() not in supported_platforms:
@@ -58,8 +56,8 @@ class CompilationCacheTest(jtu.JaxTestCase):
                      ",".join(supported_platforms))
 
   def tearDown(self):
-      super().tearDown()
-      cc._cache = None
+    super().tearDown()
+    cc._cache = None
 
   def test_compile_options(self):
     compile_options_not_filled = xla_bridge.get_compile_options(
@@ -101,9 +99,9 @@ class CompilationCacheTest(jtu.JaxTestCase):
     hash2 = self.get_hashed_value(cc._hash_platform, xla_bridge.get_backend())
     self.assertEqual(hash1, hash2)
     if xla_bridge.get_backend().platform != "cpu":
-        cpu_backend = xla_bridge.get_backend("cpu")
-        hash3 = self.get_hashed_value(cc._hash_platform, cpu_backend)
-        self.assertNotEqual(hash1, hash3)
+      cpu_backend = xla_bridge.get_backend("cpu")
+      hash3 = self.get_hashed_value(cc._hash_platform, cpu_backend)
+      self.assertNotEqual(hash1, hash3)
 
   def test_hash_int(self):
     hash1 = self.get_hashed_value(cc._hash_int, 90)
@@ -255,7 +253,7 @@ class CompilationCacheTest(jtu.JaxTestCase):
       f(x)
       files_in_directory = len(os.listdir(tmpdir))
       self.assertEqual(files_in_directory, 2)
-      #TODO: create a test for calling pmap with the same input more than once
+      # TODO: create a test for calling pmap with the same input more than once
 
   def test_jit(self):
     with tempfile.TemporaryDirectory() as tmpdir:
