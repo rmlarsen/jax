@@ -675,3 +675,18 @@ class OpShardingSharding(XLACompatibleSharding):
   def get_replicated(cls, device_assignment):
     proto = _get_replicated_op_sharding()
     return cls(device_assignment, proto)
+
+
+def are_shardings_semantically_equal(s1: Sharding, s2: Sharding,
+                                     ndim: int) -> bool:
+  if (isinstance(s1, XLACompatibleSharding) and
+      isinstance(s2, XLACompatibleSharding)):
+    # PmapSharding cannot be lowered to OpShardings so use normal equality
+    # check.
+    if isinstance(s1, PmapSharding) or isinstance(s2, PmapSharding):
+      return s1 == s2
+    return pxla.are_op_shardings_equal(s1._to_xla_op_sharding(ndim),
+                                       s2._to_xla_op_sharding(ndim))
+  else:
+    # If Sharding cannot be converted to OpSharding, then each via equality.
+    return s1 == s2

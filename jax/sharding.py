@@ -27,6 +27,7 @@ from jax._src.sharding import (
     PmapSharding as PmapSharding,
     OpShardingSharding as OpShardingSharding,
     PositionalSharding as PositionalSharding,
+    are_shardings_semantically_equal as are_shardings_semantically_equal,
 )
 
 from jax.interpreters.pxla import Mesh as Mesh

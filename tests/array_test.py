@@ -837,6 +837,17 @@ class ShardingTest(jtu.JaxTestCase):
     self.assertIn('device_ids', mesh_repr)
     self.assertIn('axis_names', mesh_repr)
 
+  def test_are_shardings_semantically_equal(self):
+    mesh = jtu.create_global_mesh((1,), ('x'))
+    s1 = jax.sharding.NamedSharding(mesh, P('x'))
+    s2 = jax.sharding.SingleDeviceSharding(jax.devices()[0])
+
+    self.assertTrue(jax.sharding.are_shardings_semantically_equal(s1, s2, 2))
+
+    s3 = jax.pmap(lambda x: x)(jnp.arange(jax.device_count())).sharding
+    self.assertFalse(jax.sharding.are_shardings_semantically_equal(s1, s3, 2))
+    self.assertFalse(jax.sharding.are_shardings_semantically_equal(s2, s3, 2))
+
 
 @jtu.with_config(jax_array=True)
 class RngShardingTest(jtu.JaxTestCase):
